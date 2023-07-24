@@ -18,6 +18,7 @@ export default function Login() {
     currentUser,
   } = useAuth();
   const [error, setError] = useState("");
+  const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const router = useRouter();
@@ -37,8 +38,19 @@ export default function Login() {
     };
   }
 
+  async function saveMyEmail() {
+    if (rememberMe) {
+      // ID 저장 처리
+      localStorage.setItem("email", emailRef.current.value);
+    } else {
+      // 저장된 store 삭제 처리
+      localStorage.clear();
+    }
+  }
+
   async function handleSubmit(e) {
     e.preventDefault();
+    saveMyEmail();
     const makeCall = callHelper(login);
     await makeCall(emailRef.current.value, passwordRef.current.value);
   }
@@ -71,6 +83,11 @@ export default function Login() {
     if (currentUser) {
       router.push("/");
     }
+    const storageEmail = localStorage.getItem("email");
+    if (storageEmail) {
+      setEmail(storageEmail);
+      setRememberMe(true);
+    }
   }, [currentUser]);
 
   return (
@@ -80,25 +97,27 @@ export default function Login() {
           <div className="g-6 flex h-full flex-wrap items-center justify-center lg:justify-between">
             {/* <!-- Left column container with background--> */}
             <div className="mb-12 md:mb-0 md:w-8/12 lg:w-6/12">
-              <h4 className="mb-6 text-xl font-semibold"><img
+              <h4 className="mb-6 text-xl font-semibold">
+                <img
                   className="inline-block h-12 w-12 rounded-full ring-2 ring-white"
                   src="https://lahuman.github.io/assets/img/logo.png"
                   alt="lahuman"
-                />Firebase Auth</h4>
+                />
+                Firebase Auth
+              </h4>
 
-                <p className="text-sm">
-                  Firebase Auth는 사용자 인증을 쉽고 빠르게 구현할 수 있는
-                  Firebase의 사용자 인터페이스 라이브러리입니다. 이 라이브러리를
-                  통해 웹 애플리케이션 또는 모바일 앱에서 사용자 로그인 및
-                  회원가입 기능을 간편하게 구현할 수 있습니다. Firebase Auth
-                  UI는 다양한 인증 방법을 지원하며, 소셜 로그인 (Google,
-                  Facebook, Twitter 등)부터 이메일/비밀번호 인증까지 다양한
-                  옵션을 제공합니다. 또한 사용자 환경에 맞게 커스터마이징할 수
-                  있어서, 앱의 디자인에 맞게 인증 화면을 조정할 수 있습니다.
-                  Firebase Auth를 사용하면 보안적인 측면에서도 안심할 수 있으며,
-                  개발자는 더욱 집중적으로 애플리케이션 기능 개발에 집중할 수
-                  있습니다.
-                </p>
+              <p className="text-sm">
+                Firebase Auth는 사용자 인증을 쉽고 빠르게 구현할 수 있는
+                Firebase의 사용자 인터페이스 라이브러리입니다. 이 라이브러리를
+                통해 웹 애플리케이션 또는 모바일 앱에서 사용자 로그인 및
+                회원가입 기능을 간편하게 구현할 수 있습니다. Firebase Auth UI는
+                다양한 인증 방법을 지원하며, 소셜 로그인 (Google, Facebook,
+                Twitter 등)부터 이메일/비밀번호 인증까지 다양한 옵션을
+                제공합니다. 또한 사용자 환경에 맞게 커스터마이징할 수 있어서,
+                앱의 디자인에 맞게 인증 화면을 조정할 수 있습니다. Firebase
+                Auth를 사용하면 보안적인 측면에서도 안심할 수 있으며, 개발자는
+                더욱 집중적으로 애플리케이션 기능 개발에 집중할 수 있습니다.
+              </p>
             </div>
 
             {/* <!-- Right column container with form --> */}
@@ -110,6 +129,8 @@ export default function Login() {
                   <input
                     type="email"
                     ref={emailRef}
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     required
                     className="peer block min-h-[auto] w-full rounded border-2 bg-transparent px-3 py-[0.32rem] leading-[2.15] outline-none transition-all duration-200 ease-linear "
                     id="exampleFormControlInput3"
